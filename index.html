@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فرم سفارش طراحی سایت</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a1420;
+    --bg2:#0c1926;
+    --panel:#0f1e2e;
+    --panel2:#122437;
+    --grid:rgba(94,234,212,.075);
+    --grid-strong:rgba(94,234,212,.15);
+    --ink:#eaf3f4;
+    --muted:#7fa0ac;
+    --muted2:#4f7180;
+    --cyan:#4fd8c4;
+    --cyan-dim:#4fd8c433;
+    --stamp:#d9483a;
+    --stamp-dim:#d9483a22;
+    --rubika:#2AABEE;
+    --bale:#26A65B;
+    --line:#1c3346;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--bg2),var(--bg2)) ,
+      repeating-linear-gradient(0deg, var(--grid) 0px, var(--grid) 1px, transparent 1px, transparent 32px),
+      repeating-linear-gradient(90deg, var(--grid) 0px, var(--grid) 1px, transparent 1px, transparent 32px),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Vazirmatn',sans-serif;
+    min-height:100vh;
+    padding:32px 16px 80px;
+    position:relative;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background:
+      repeating-linear-gradient(0deg, var(--grid-strong) 0px, var(--grid-strong) 1px, transparent 1px, transparent 160px),
+      repeating-linear-gradient(90deg, var(--grid-strong) 0px, var(--grid-strong) 1px, transparent 1px, transparent 160px);
+    pointer-events:none;
+    z-index:0;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  .wrap{max-width:760px;margin:0 auto;position:relative;z-index:1;}
+
+  .top-eyebrow{
+    display:flex; align-items:center; gap:10px;
+    color:var(--cyan); font-size:12.5px; letter-spacing:.12em;
+    margin-bottom:18px;
+  }
+  .top-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+
+  .masthead{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-bottom:1px solid var(--line);
+    padding-bottom:18px; margin-bottom:28px;
+  }
+  .masthead h1{
+    font-size:26px; font-weight:800; margin:0; letter-spacing:-.01em;
+  }
+  .masthead .sub{color:var(--muted); font-size:13.5px; margin-top:6px;}
+  .masthead .ref{
+    color:var(--muted2); font-size:11.5px; text-align:left; direction:ltr;
+  }
+
+  .ruler{
+    position:relative;
+    display:flex;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--panel);
+    padding:14px 16px 10px;
+    margin-bottom:26px;
+    overflow:hidden;
+  }
+  .ruler-track{
+    position:absolute; right:16px; left:16px; top:32px; height:2px;
+    background:var(--line);
+  }
+  .ruler-fill{
+    position:absolute; right:16px; top:32px; height:2px;
+    background:var(--cyan);
+    box-shadow:0 0 8px var(--cyan);
+    width:0%;
+    transition:width .5s cubic-bezier(.65,.05,.36,1);
+  }
+  .ruler-ticks{
+    display:flex; justify-content:space-between; width:100%; position:relative; z-index:1;
+  }
+  .tick{
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    flex:1; min-width:0;
+  }
+  .tick-mark{
+    width:9px; height:9px; border-radius:50%;
+    background:var(--panel2); border:2px solid var(--line);
+    transition:all .35s ease;
+  }
+  .tick.done .tick-mark{background:var(--cyan); border-color:var(--cyan); box-shadow:0 0 8px var(--cyan);}
+  .tick.active .tick-mark{background:var(--bg); border-color:var(--cyan); transform:scale(1.4);}
+  .tick-label{
+    font-size:9.5px; color:var(--muted2); letter-spacing:.03em;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70px;
+  }
+  .tick.active .tick-label, .tick.done .tick-label{color:var(--cyan);}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:34px 30px 28px;
+    position:relative;
+    min-height:340px;
+    box-shadow:0 20px 60px -30px rgba(0,0,0,.6);
+  }
+  .card::before{
+    content:"";
+    position:absolute; top:14px; right:14px; bottom:14px; left:14px;
+    border:1px dashed var(--line);
+    border-radius:8px;
+    pointer-events:none;
+    opacity:.5;
+  }
+
+  .step{ display:none; animation:draw-in .5s ease; }
+  .step.active{ display:block; }
+  @keyframes draw-in{
+    from{ opacity:0; transform:translateY(10px); clip-path: inset(0 0 100% 0); }
+    to{ opacity:1; transform:translateY(0); clip-path: inset(0 0 0% 0); }
+  }
+
+  .step-eyebrow{
+    color:var(--cyan); font-size:11.5px; letter-spacing:.14em; margin-bottom:8px;
+  }
+  .step h2{ font-size:21px; margin:0 0 6px; font-weight:700; }
+  .step p.hint{ color:var(--muted); font-size:13.5px; margin:0 0 22px; line-height:1.9; }
+
+  label.field{ display:block; margin-bottom:18px; }
+  label.field .flabel{
+    display:block; font-size:13px; color:var(--muted); margin-bottom:7px;
+  }
+  input[type=text], input[type=tel], input[type=email], textarea, select{
+    width:100%; background:var(--bg2); border:1px solid var(--line); color:var(--ink);
+    border-radius:8px; padding:11px 13px; font-family:'Vazirmatn',sans-serif; font-size:14.5px;
+    outline:none; transition:border-color .2s, box-shadow .2s;
+  }
+  input:focus, textarea:focus, select:focus{
+    border-color:var(--cyan); box-shadow:0 0 0 3px var(--cyan-dim);
+  }
+  textarea{resize:vertical; min-height:90px; line-height:1.8;}
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:560px){ .row2{grid-template-columns:1fr;} }
+
+  .chip-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width:560px){ .chip-grid{grid-template-columns:1fr;} }
+  .chip{
+    border:1px solid var(--line); background:var(--bg2); border-radius:9px;
+    padding:13px 14px; cursor:pointer; transition:all .18s ease; position:relative;
+  }
+  .chip:hover{ border-color:var(--muted2); }
+  .chip input{ position:absolute; opacity:0; pointer-events:none; }
+  .chip .ctitle{ font-size:14px; font-weight:600; display:flex; justify-content:space-between; align-items:center;}
+  .chip .cdesc{ font-size:12px; color:var(--muted); margin-top:4px; line-height:1.6;}
+  .chip .mark{
+    width:16px;height:16px;border-radius:5px;border:1.5px solid var(--muted2); flex-shrink:0;
+    display:flex;align-items:center;justify-content:center; font-size:11px; color:var(--bg);
+  }
+  .chip.checked{ border-color:var(--cyan); background:linear-gradient(180deg,var(--cyan-dim),transparent); }
+  .chip.checked .mark{ background:var(--cyan); border-color:var(--cyan); }
+  .chip.checked .mark::after{ content:"✓"; }
+
+  .swatches{ display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+  .swatch{
+    width:34px; height:34px; border-radius:50%; cursor:pointer; border:2px solid transparent;
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  .swatch.picked{ border-color:#fff; transform:scale(1.15); }
+
+  .nav-row{
+    display:flex; justify-content:space-between; align-items:center; margin-top:28px;
+  }
+  button, a.btn{ font-family:'Vazirmatn',sans-serif; cursor:pointer; border:none; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
+  .btn-ghost{
+    background:transparent; color:var(--muted); font-size:13.5px; padding:11px 6px;
+  }
+  .btn-ghost:hover{ color:var(--ink); }
+  .btn-ghost:disabled{ opacity:.3; cursor:default; }
+  .btn-primary{
+    background:var(--cyan); color:#052824; font-weight:700; font-size:14px;
+    padding:12px 26px; border-radius:8px; transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 8px 22px -10px var(--cyan-dim);
+  }
+  .btn-primary:hover{ transform:translateY(-1px); box-shadow:0 12px 26px -10px var(--cyan-dim); }
+  .btn-stamp{
+    background:var(--stamp); color:#fff;
+  }
+  .btn-rubika{
+    background:var(--rubika); color:#fff; font-weight:700; font-size:13.5px;
+    padding:11px 20px; border-radius:8px; gap:8px;
+    box-shadow:0 8px 22px -10px rgba(42,171,238,.5);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-rubika:hover{ transform:translateY(-1px); box-shadow:0 12px 26px -10px rgba(42,171,238,.6); }
+  .btn-bale{
+    background:var(--bale); color:#fff; font-weight:700; font-size:13.5px;
+    padding:11px 20px; border-radius:8px; gap:8px;
+    box-shadow:0 8px 22px -10px rgba(38,166,91,.5);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-bale:hover{ transform:translateY(-1px); box-shadow:0 12px 26px -10px rgba(38,166,91,.6); }
+
+  .intro-wire{
+    width:100%; height:150px; margin-bottom:20px;
+  }
+  .intro-wire path, .intro-wire rect, .intro-wire line{
+    stroke:var(--cyan); fill:none; stroke-width:1.4;
+    stroke-dasharray:600; stroke-dashoffset:600;
+    animation:draw 1.8s ease forwards;
+  }
+  @keyframes draw{ to{ stroke-dashoffset:0; } }
+
+  .invoice{
+    border:1px solid var(--line); border-radius:10px; background:var(--bg2);
+    padding:22px 22px 18px; position:relative; overflow:hidden;
+  }
+  .invoice-head{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    border-bottom:1px dashed var(--line); padding-bottom:14px; margin-bottom:14px;
+  }
+  .invoice-head h3{ margin:0 0 4px; font-size:17px; }
+  .invoice-head .oid{ color:var(--muted2); font-size:11.5px; }
+  .stamp-mark{
+    width:64px; height:64px; border:2.5px solid var(--stamp); border-radius:50%;
+    color:var(--stamp); display:flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:700; text-align:center; letter-spacing:.05em;
+    transform:rotate(-14deg) scale(0);
+    animation:stamp-in .4s cubic-bezier(.34,1.56,.64,1) .3s forwards;
+    flex-shrink:0;
+  }
+  @keyframes stamp-in{ to{ transform:rotate(-14deg) scale(1); } }
+  .irow{
+    display:flex; justify-content:space-between; gap:16px; padding:9px 0;
+    border-bottom:1px solid var(--line); font-size:13.5px;
+  }
+  .irow:last-child{ border-bottom:none; }
+  .irow .k{ color:var(--muted); flex-shrink:0; min-width:120px; }
+  .irow .v{ color:var(--ink); text-align:left; line-height:1.8; }
+
+  .copy-row{ display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; align-items:center; }
+  .sms-status{ font-size:12.5px; margin-top:10px; padding:9px 12px; border-radius:8px; display:none; }
+  .sms-status.show{ display:block; }
+  .sms-status.pending{ color:var(--muted); background:var(--bg2); border:1px solid var(--line); }
+  .sms-status.ok{ color:var(--cyan); background:var(--cyan-dim); border:1px solid var(--cyan); }
+  .sms-status.err{ color:var(--stamp); background:var(--stamp-dim); border:1px solid var(--stamp); }
+  .btn-copy{
+    background:var(--panel2); color:var(--ink); border:1px solid var(--line);
+    padding:11px 20px; border-radius:8px; font-size:13.5px; font-weight:600;
+  }
+  .btn-copy:hover{ border-color:var(--cyan); color:var(--cyan); }
+  .copied-note{ color:var(--cyan); font-size:12.5px; align-self:center; opacity:0; transition:opacity .2s; }
+  .copied-note.show{ opacity:1; }
+  .rubika-hint{ width:100%; color:var(--muted2); font-size:11.5px; margin-top:-4px; }
+
+  footer{
+    text-align:center; color:var(--muted2); font-size:11.5px; margin-top:26px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-eyebrow"><span class="dot"></span><span class="mono">SITE-SPEC / نقشهٔ سفارش سایت</span></div>
+
+  <div class="masthead">
+    <div>
+      <h1>فرم سفارش طراحی سایت</h1>
+      <div class="sub">مشخصات سایت موردنظرتان را وارد کنید — در پایان یک «فاکتور سفارش» برایتان ساخته می‌شود.</div>
+    </div>
+    <div class="ref mono" id="today"></div>
+  </div>
+
+  <div class="ruler">
+    <div class="ruler-track"></div>
+    <div class="ruler-fill" id="rulerFill"></div>
+    <div class="ruler-ticks" id="ticks"></div>
+  </div>
+
+  <div class="card">
+
+    <div class="step active" data-step="0">
+      <svg class="intro-wire" viewBox="0 0 400 150">
+        <rect x="20" y="16" width="360" height="118" rx="6"></rect>
+        <line x1="20" y1="42" x2="380" y2="42"></line>
+        <path d="M32 26 h6 M46 26 h6 M60 26 h6"></path>
+        <rect x="40" y="58" width="100" height="60" rx="3"></rect>
+        <path d="M160 60 h200 M160 78 h160 M160 96 h180 M160 112 h120"></path>
+      </svg>
+      <div class="step-eyebrow mono">START</div>
+      <h2>بیایید نقشهٔ سایت شما را بکشیم</h2>
+      <p class="hint">پاسخ به این چند بخش کوتاه، حدود ۳ دقیقه زمان می‌برد. هرچه دقیق‌تر پر کنید، طراحی نهایی به ذهنیت شما نزدیک‌تر خواهد بود.</p>
+      <div class="nav-row">
+        <span></span>
+        <button class="btn-primary" onclick="go(1)">شروع کنیم ←</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="1">
+      <div class="step-eyebrow mono">01 / مشتری</div>
+      <h2>اطلاعات تماس</h2>
+      <p class="hint">این بخش برای هماهنگی بعدی استفاده می‌شود.</p>
+      <div class="row2">
+        <label class="field"><span class="flabel">نام و نام‌خانوادگی</span><input type="text" id="f_name" placeholder="مثلاً: علی رضایی"></label>
+        <label class="field"><span class="flabel">نام کسب‌وکار / برند</span><input type="text" id="f_biz" placeholder="مثلاً: فروشگاه رزا"></label>
+      </div>
+      <div class="row2">
+        <label class="field"><span class="flabel">شماره تماس</span><input type="tel" id="f_phone" placeholder="09xxxxxxxxx"></label>
+        <label class="field"><span class="flabel">ایمیل</span><input type="email" id="f_email" placeholder="you@example.com"></label>
+      </div>
+      <div class="nav-row">
+        <button class="btn-ghost" onclick="go(0)">→ قبلی</button>
+        <button class="btn-primary" onclick="go(2)">بعدی ←</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="2">
+      <div class="step-eyebrow mono">02 / ساختار</div>
+      <h2>نوع سایت و صفحات</h2>
+      <p class="hint">نوع سایت را انتخاب کنید (می‌توانید بیشتر از یکی را بزنید).</p>
+      <div class="chip-grid" id="siteType">
+        <div class="chip" data-val="فروشگاهی"><div class="ctitle">فروشگاهی <span class="mark"></span></div><div class="cdesc">فروش آنلاین محصول با سبد خرید و پرداخت</div></div>
+        <div class="chip" data-val="شرکتی / معرفی خدمات"><div class="ctitle">شرکتی / معرفی خدمات <span class="mark"></span></div><div class="cdesc">معرفی کسب‌وکار، خدمات و تیم</div></div>
+        <div class="chip" data-val="پرتفولیو / نمونه‌کار"><div class="ctitle">پرتفولیو / نمونه‌کار <span class="mark"></span></div><div class="cdesc">نمایش آثار و سوابق کاری</div></div>
+        <div class="chip" data-val="وبلاگ / محتوایی"><div class="ctitle">وبلاگ / محتوایی <span class="mark"></span></div><div class="cdesc">انتشار مقاله و محتوا</div></div>
+        <div class="chip" data-val="رزرو / نوبت‌دهی"><div class="ctitle">رزرو / نوبت‌دهی <span class="mark"></span></div><div class="cdesc">رزرو آنلاین وقت یا خدمات</div></div>
+        <div class="chip" data-val="سایر"><div class="ctitle">سایر <span class="mark"></span></div><div class="cdesc">توضیح در انتهای فرم</div></div>
+      </div>
+      <label class="field" style="margin-top:18px;"><span class="flabel">صفحات موردنیاز (هرکدام را با کاما جدا کنید)</span><input type="text" id="f_pages" placeholder="مثلاً: صفحه اصلی، درباره ما، محصولات، تماس با ما"></label>
+      <div class="nav-row">
+        <button class="btn-ghost" onclick="go(1)">→ قبلی</button>
+        <button class="btn-primary" onclick="go(3)">بعدی ←</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="3">
+      <div class="step-eyebrow mono">03 / طراحی</div>
+      <h2>سبک بصری</h2>
+      <p class="hint">حس‌وحال کلی سایت چطور باشد؟</p>
+      <div class="chip-grid" id="siteStyle">
+        <div class="chip" data-val="مینیمال و ساده"><div class="ctitle">مینیمال و ساده <span class="mark"></span></div><div class="cdesc">فضای خالی زیاد، تمیز و آرام</div></div>
+        <div class="chip" data-val="لوکس و شیک"><div class="ctitle">لوکس و شیک <span class="mark"></span></div><div class="cdesc">رنگ‌های تیره، جزئیات ظریف</div></div>
+        <div class="chip" data-val="پرانرژی و رنگی"><div class="ctitle">پرانرژی و رنگی <span class="mark"></span></div><div class="cdesc">رنگ‌های شاد، پویا و جوان</div></div>
+        <div class="chip" data-val="کلاسیک و رسمی"><div class="ctitle">کلاسیک و رسمی <span class="mark"></span></div><div class="cdesc">قابل‌اعتماد و سازمانی</div></div>
+      </div>
+      <label class="field" style="margin-top:16px;"><span class="flabel">رنگ‌های مورد علاقه</span></label>
+      <div class="swatches" id="swatches">
+        <div class="swatch" style="background:#4fd8c4" data-c="فیروزه‌ای"></div>
+        <div class="swatch" style="background:#d9483a" data-c="قرمز آجری"></div>
+        <div class="swatch" style="background:#f6b93b" data-c="نارنجی/زرد"></div>
+        <div class="swatch" style="background:#5b6ee1" data-c="آبی"></div>
+        <div class="swatch" style="background:#5cb85c" data-c="سبز"></div>
+        <div class="swatch" style="background:#2b2b2b" data-c="مشکی/تیره"></div>
+        <div class="swatch" style="background:#f4f1ea;border:1px solid #333" data-c="کِرِم/روشن"></div>
+        <div class="swatch" style="background:#a566d6" data-c="بنفش"></div>
+      </div>
+      <label class="field" style="margin-top:16px;"><span class="flabel">لینک چند سایت که استایلش را می‌پسندید (اختیاری)</span><input type="text" id="f_refs" placeholder="مثلاً: example.com , example2.com"></label>
+      <div class="nav-row">
+        <button class="btn-ghost" onclick="go(2)">→ قبلی</button>
+        <button class="btn-primary" onclick="go(4)">بعدی ←</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="4">
+      <div class="step-eyebrow mono">04 / امکانات</div>
+      <h2>امکانات موردنیاز</h2>
+      <p class="hint">هرچه لازم دارید انتخاب کنید.</p>
+      <div class="chip-grid" id="features">
+        <div class="chip" data-val="فرم تماس"><div class="ctitle">فرم تماس <span class="mark"></span></div></div>
+        <div class="chip" data-val="چت آنلاین / واتس‌اپ"><div class="ctitle">چت آنلاین / واتس‌اپ <span class="mark"></span></div></div>
+        <div class="chip" data-val="درگاه پرداخت"><div class="ctitle">درگاه پرداخت <span class="mark"></span></div></div>
+        <div class="chip" data-val="پنل مدیریت محتوا"><div class="ctitle">پنل مدیریت محتوا <span class="mark"></span></div></div>
+        <div class="chip" data-val="چندزبانه"><div class="ctitle">چندزبانه <span class="mark"></span></div></div>
+        <div class="chip" data-val="بلاگ / اخبار"><div class="ctitle">بلاگ / اخبار <span class="mark"></span></div></div>
+        <div class="chip" data-val="نقشه و موقعیت"><div class="ctitle">نقشه و موقعیت <span class="mark"></span></div></div>
+        <div class="chip" data-val="اتصال به شبکه‌های اجتماعی"><div class="ctitle">اتصال به شبکه‌های اجتماعی <span class="mark"></span></div></div>
+      </div>
+      <div class="nav-row">
+        <button class="btn-ghost" onclick="go(3)">→ قبلی</button>
+        <button class="btn-primary" onclick="go(5)">بعدی ←</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="5">
+      <div class="step-eyebrow mono">05 / لجستیک</div>
+      <h2>محتوا، دامنه و بودجه</h2>
+      <div class="row2">
+        <label class="field"><span class="flabel">وضعیت محتوا (متن/عکس/لوگو)</span>
+          <select id="f_content">
+            <option value="">انتخاب کنید</option>
+            <option>کاملاً آماده دارم</option>
+            <option>بخشی آماده دارم</option>
+            <option>هیچی ندارم، شما تهیه کنید</option>
+          </select>
+        </label>
+        <label class="field"><span class="flabel">دامنه و هاست</span>
+          <select id="f_domain">
+            <option value="">انتخاب کنید</option>
+            <option>دامنه و هاست دارم</option>
+            <option>فقط دامنه دارم</option>
+            <option>هیچ‌کدام را ندارم</option>
+          </select>
+        </label>
+      </div>
+      <div class="row2">
+        <label class="field"><span class="flabel">بودجه تقریبی</span>
+          <select id="f_budget">
+            <option value="">انتخاب کنید</option>
+            <option>زیر ۵ میلیون تومان</option>
+            <option>۵ تا ۱۵ میلیون تومان</option>
+            <option>۱۵ تا ۳۰ میلیون تومان</option>
+            <option>بالای ۳۰ میلیون تومان</option>
+            <option>هنوز مشخص نیست</option>
+          </select>
+        </label>
+        <label class="field"><span class="flabel">زمان‌بندی موردنظر</span>
+          <select id="f_time">
+            <option value="">انتخاب کنید</option>
+            <option>فوری (کمتر از ۲ هفته)</option>
+            <option>۲ تا ۴ هفته</option>
+            <option>۱ تا ۲ ماه</option>
+            <option>عجله‌ای ندارم</option>
+          </select>
+        </label>
+      </div>
+      <div class="nav-row">
+        <button class="btn-ghost" onclick="go(4)">→ قبلی</button>
+        <button class="btn-primary" onclick="go(6)">بعدی ←</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="6">
+      <div class="step-eyebrow mono">06 / توضیحات</div>
+      <h2>نکات تکمیلی</h2>
+      <p class="hint">هر نکته‌ای که فکر می‌کنید در طراحی مؤثر است اینجا بنویسید.</p>
+      <label class="field"><span class="flabel">توضیحات آزاد</span><textarea id="f_notes" placeholder="مثلاً: رقبا، حساسیت‌های خاص، انیمیشن دلخواه، سایت‌های مشابه و..."></textarea></label>
+      <div class="nav-row">
+        <button class="btn-ghost" onclick="go(5)">→ قبلی</button>
+        <button class="btn-primary btn-stamp" onclick="buildInvoice(); go(7);">ساخت فاکتور سفارش ←</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="7">
+      <div class="step-eyebrow mono">07 / تکمیل شد</div>
+      <h2>فاکتور سفارش شما آماده است</h2>
+      <p class="hint">این خلاصه را کپی کرده و برای کارفرما در بله یا روبیکا ارسال کنید تا ساخت سایت آغاز شود.</p>
+
+      <div class="invoice" id="invoiceBox">
+        <div class="invoice-head">
+          <div>
+            <h3 id="inv_biz">—</h3>
+            <div class="oid mono" id="inv_id">—</div>
+          </div>
+          <div class="stamp-mark">تأیید<br>نهایی</div>
+        </div>
+        <div id="invoiceRows"></div>
+      </div>
+      <div class="sms-status mono" id="smsStatus"></div>
+
+      <div class="copy-row">
+        <a class="btn btn-bale" id="baleBtn" href="https://ble.ir/poshtibany12" target="_blank" rel="noopener" onclick="copyInvoice()">
+          ارسال به کارفرما (بله) ←
+        </a>
+        <a class="btn btn-rubika" id="rubikaBtn" href="https://rubika.ir/Sales_Support_a" target="_blank" rel="noopener" onclick="copyInvoice()">
+          ارسال به کارفرما (روبیکا) ←
+        </a>
+        <button class="btn-copy" onclick="copyInvoice()">📋 کپی خلاصه سفارش</button>
+        <span class="copied-note" id="copiedNote">کپی شد ✓ حالا در بله یا روبیکا پیست کنید</span>
+        <div class="rubika-hint">با کلیک روی «ارسال به کارفرما»، خلاصه سفارش کپی می‌شود و صفحهٔ چت پشتیبانی در بله (poshtibany12@) یا روبیکا (@Sales_Support_a) باز می‌شود — کافی‌ست پیام را Paste و ارسال کنید.</div>
+      </div>
+      <div class="nav-row">
+        <button class="btn-ghost" onclick="go(6)">→ ویرایش پاسخ‌ها</button>
+        <span></span>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>پس از تکمیل، خلاصهٔ سفارش را کپی کرده و برای کارفرما در بله (poshtibany12@) یا روبیکا (@Sales_Support_a) ارسال کنید.</footer>
+</div>
+
+<script>
+  document.getElementById('today').textContent = new Date().toLocaleDateString('fa-IR');
+
+  const stepLabels = ['شروع','تماس','ساختار','طراحی','امکانات','لجستیک','توضیحات','فاکتور'];
+  const ticksEl = document.getElementById('ticks');
+  stepLabels.forEach((label,i)=>{
+    const t = document.createElement('div');
+    t.className = 'tick';
+    t.id = 'tick'+i;
+    t.innerHTML = `<div class="tick-mark"></div><div class="tick-label">${label}</div>`;
+    ticksEl.appendChild(t);
+  });
+
+  let current = 0;
+  const totalSteps = stepLabels.length;
+
+  function updateProgress(){
+    for(let i=0;i<totalSteps;i++){
+      const t = document.getElementById('tick'+i);
+      t.classList.remove('active','done');
+      if(i < current) t.classList.add('done');
+      else if(i === current) t.classList.add('active');
+    }
+    document.getElementById('rulerFill').style.width = (current/(totalSteps-1)*100)+'%';
+  }
+
+  function go(step){
+    document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+    document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+    current = step;
+    updateProgress();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  updateProgress();
+
+  document.querySelectorAll('.chip-grid').forEach(grid=>{
+    grid.addEventListener('click', e=>{
+      const chip = e.target.closest('.chip');
+      if(!chip) return;
+      chip.classList.toggle('checked');
+    });
+  });
+
+  document.getElementById('swatches').addEventListener('click', e=>{
+    const sw = e.target.closest('.swatch');
+    if(!sw) return;
+    sw.classList.toggle('picked');
+  });
+
+  function getChecked(gridId){
+    return Array.from(document.querySelectorAll('#'+gridId+' .chip.checked'))
+      .map(c=>c.dataset.val);
+  }
+  function listOrDash(arr){ return arr.length ? arr.join('، ') : '—'; }
+  function valOrDash(v){ return v && v.trim() ? v.trim() : '—'; }
+
+  function buildInvoice(){
+    const name = valOrDash(document.getElementById('f_name').value);
+    const biz = valOrDash(document.getElementById('f_biz').value);
+    const phone = valOrDash(document.getElementById('f_phone').value);
+    const email = valOrDash(document.getElementById('f_email').value);
+    const types = listOrDash(getChecked('siteType'));
+    const pages = valOrDash(document.getElementById('f_pages').value);
+    const styles = listOrDash(getChecked('siteStyle'));
+    const colors = listOrDash(Array.from(document.querySelectorAll('.swatch.picked')).map(s=>s.dataset.c));
+    const refs = valOrDash(document.getElementById('f_refs').value);
+    const feats = listOrDash(getChecked('features'));
+    const content = valOrDash(document.getElementById('f_content').value);
+    const domain = valOrDash(document.getElementById('f_domain').value);
+    const budget = valOrDash(document.getElementById('f_budget').value);
+    const time = valOrDash(document.getElementById('f_time').value);
+    const notes = valOrDash(document.getElementById('f_notes').value);
+
+    const orderId = 'ORD-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(Math.random()*900+100);
+
+    document.getElementById('inv_biz').textContent = biz !== '—' ? biz : (name !== '—' ? name : 'مشتری جدید');
+    document.getElementById('inv_id').textContent = orderId + '  •  ' + new Date().toLocaleDateString('fa-IR');
+
+    const rows = [
+      ['نام مشتری', name],
+      ['شماره تماس', phone],
+      ['ایمیل', email],
+      ['نوع سایت', types],
+      ['صفحات موردنیاز', pages],
+      ['سبک بصری', styles],
+      ['رنگ‌های مورد علاقه', colors],
+      ['نمونه سایت‌های مرجع', refs],
+      ['امکانات موردنیاز', feats],
+      ['وضعیت محتوا', content],
+      ['دامنه و هاست', domain],
+      ['بودجه تقریبی', budget],
+      ['زمان‌بندی', time],
+      ['توضیحات تکمیلی', notes],
+    ];
+
+    document.getElementById('invoiceRows').innerHTML = rows.map(([k,v])=>
+      `<div class="irow"><div class="k">${k}</div><div class="v">${v}</div></div>`
+    ).join('');
+
+    window._invoiceText = `فاکتور سفارش طراحی سایت\nشماره سفارش: ${orderId}\nتاریخ: ${new Date().toLocaleDateString('fa-IR')}\n\n` +
+      rows.map(([k,v])=>`${k}: ${v}`).join('\n') +
+      `\n\nارسال شده برای: @Sales_Support_a`;
+
+    sendOrderSms(window._invoiceText);
+  }
+
+  // شماره‌ای که فاکتور سفارش‌های جدید به آن پیامک می‌شود (شماره صاحب سایت)
+  const OWNER_SMS_NUMBERS = ['09967069304'];
+  // آدرس ورکر Cloudflare که واسط بین فرم و ملی‌پیامک است
+  const SMS_WORKER_URL = 'https://apir.danyalcode.ir/';
+
+  function setSmsStatus(state, msg){
+    const el = document.getElementById('smsStatus');
+    el.className = 'sms-status show ' + state;
+    el.textContent = msg;
+  }
+
+  async function sendOrderSms(text){
+    setSmsStatus('pending', 'در حال ارسال فاکتور به پیامک کارفرما...');
+    try{
+      const res = await fetch(SMS_WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: '50004001499670',
+          to: OWNER_SMS_NUMBERS[0],
+          text: text
+        })
+      });
+      if(!res.ok) throw new Error('worker status ' + res.status);
+      setSmsStatus('ok', '✓ فاکتور سفارش با موفقیت پیامک شد');
+    }catch(err){
+      console.error('SMS send failed:', err);
+      setSmsStatus('err', 'ارسال خودکار پیامک ناموفق بود — لطفاً از دکمه «کپی خلاصه سفارش» استفاده کنید');
+    }
+  }
+
+  function copyInvoice(){
+    if(!window._invoiceText) buildInvoice();
+    navigator.clipboard.writeText(window._invoiceText).then(()=>{
+      const note = document.getElementById('copiedNote');
+      note.classList.add('show');
+      setTimeout(()=>note.classList.remove('show'), 3000);
+    });
+  }
+</script>
+</body>
+</html>
