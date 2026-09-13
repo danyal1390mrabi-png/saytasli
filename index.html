@@ -608,6 +608,8 @@
   const OWNER_SMS_NUMBERS = ['09967069304'];
   // آدرس ورکر Cloudflare که واسط بین فرم و ملی‌پیامک است
   const SMS_WORKER_URL = 'https://apir.danyalcode.ir/';
+  // باید دقیقاً با APP_SECRET داخل کد ورکر یکسان باشد
+  const SMS_APP_SECRET = 'change-this-secret-1234';
 
   function setSmsStatus(state, msg){
     const el = document.getElementById('smsStatus');
@@ -620,7 +622,10 @@
     try{
       const res = await fetch(SMS_WORKER_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-App-Secret': SMS_APP_SECRET
+        },
         body: JSON.stringify({
           from: '50004001499670',
           to: OWNER_SMS_NUMBERS[0],
