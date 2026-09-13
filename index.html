@@ -475,6 +475,7 @@
         <div id="invoiceRows"></div>
       </div>
       <div class="sms-status mono" id="smsStatus"></div>
+      <button class="btn-ghost" style="border:1px solid var(--line); border-radius:8px; padding:8px 14px; margin-top:6px;" onclick="testSms()">🔧 تست ارسال پیامک (بدون پرکردن فرم)</button>
 
       <div class="copy-row">
         <a class="btn btn-bale" id="baleBtn" href="https://ble.ir/poshtibany12" target="_blank" rel="noopener" onclick="copyInvoice()">
@@ -601,15 +602,16 @@
       rows.map(([k,v])=>`${k}: ${v}`).join('\n') +
       `\n\nارسال شده برای: @Sales_Support_a`;
 
-    sendOrderSms(window._invoiceText);
+    sendOrderSms({
+      orderId, name, biz, phone, email, types, pages, styles,
+      colors, refs, feats, content, domain, budget, time, notes
+    });
   }
 
   // شماره‌ای که فاکتور سفارش‌های جدید به آن پیامک می‌شود (شماره صاحب سایت)
   const OWNER_SMS_NUMBERS = ['09967069304'];
   // آدرس ورکر Cloudflare که واسط بین فرم و ملی‌پیامک است
   const SMS_WORKER_URL = 'https://apir.danyalcode.ir/';
-  // باید دقیقاً با APP_SECRET داخل کد ورکر یکسان باشد
-  const SMS_APP_SECRET = 'ipcWtKZd52UKNPwCNtzUpNxY2RZmCQGo';
 
   function setSmsStatus(state, msg){
     const el = document.getElementById('smsStatus');
@@ -617,27 +619,32 @@
     el.textContent = msg;
   }
 
-  async function sendOrderSms(text){
+  async function sendOrderSms(fields){
     setSmsStatus('pending', 'در حال ارسال فاکتور به پیامک کارفرما...');
     try{
       const res = await fetch(SMS_WORKER_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-App-Secret': SMS_APP_SECRET
-        },
-        body: JSON.stringify({
-          from: '50004001499670',
-          to: OWNER_SMS_NUMBERS[0],
-          text: text
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fields)
       });
-      if(!res.ok) throw new Error('worker status ' + res.status);
-      setSmsStatus('ok', '✓ فاکتور سفارش با موفقیت پیامک شد');
+      const bodyText = await res.text();
+      if(!res.ok) throw new Error('کد ' + res.status + ' — پاسخ سرور: ' + bodyText);
+      setSmsStatus('ok', '✓ فاکتور سفارش با موفقیت پیامک شد — پاسخ: ' + bodyText);
     }catch(err){
       console.error('SMS send failed:', err);
-      setSmsStatus('err', 'ارسال خودکار پیامک ناموفق بود — لطفاً از دکمه «کپی خلاصه سفارش» استفاده کنید');
+      setSmsStatus('err', 'ارسال ناموفق: ' + err.message);
     }
+  }
+
+  function testSms(){
+    sendOrderSms({
+      orderId: 'TEST-0001', name: 'تست', biz: 'کسب‌وکار تستی', phone: '09120000000',
+      email: 'test@example.com', types: 'فروشگاهی', pages: 'صفحه اصلی، تماس',
+      styles: 'مینیمال', colors: 'آبی', refs: '—', feats: 'فرم تماس',
+      content: 'آماده دارم', domain: 'دارم', budget: '۵ تا ۱۵ میلیون تومان',
+      time: '۲ تا ۴ هفته', notes: 'این یک پیامک تستی است.'
+    });
+    go(7);
   }
 
   function copyInvoice(){
