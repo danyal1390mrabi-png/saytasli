@@ -150,6 +150,7 @@
   label.field .flabel{
     display:block; font-size:13px; color:var(--muted); margin-bottom:7px;
   }
+  label.field .flabel .req{ color:var(--stamp); margin-right:3px; }
   input[type=text], input[type=tel], input[type=email], textarea, select{
     width:100%; background:var(--bg2); border:1px solid var(--line); color:var(--ink);
     border-radius:8px; padding:11px 13px; font-family:'Vazirmatn',sans-serif; font-size:14.5px;
@@ -158,11 +159,20 @@
   input:focus, textarea:focus, select:focus{
     border-color:var(--cyan); box-shadow:0 0 0 3px var(--cyan-dim);
   }
+  input.field-error, textarea.field-error, select.field-error{
+    border-color:var(--stamp); box-shadow:0 0 0 3px var(--stamp-dim);
+  }
   textarea{resize:vertical; min-height:90px; line-height:1.8;}
   .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   @media (max-width:560px){ .row2{grid-template-columns:1fr;} }
 
+  .field-err-msg{
+    color:var(--stamp); font-size:11.5px; margin-top:6px; display:none;
+  }
+  .field-err-msg.show{ display:block; }
+
   .chip-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .chip-grid.group-error{ outline:1.5px solid var(--stamp); outline-offset:6px; border-radius:10px; }
   @media (max-width:560px){ .chip-grid{grid-template-columns:1fr;} }
   .chip{
     border:1px solid var(--line); background:var(--bg2); border-radius:9px;
@@ -320,23 +330,23 @@
       <h2>اطلاعات تماس</h2>
       <p class="hint">این بخش برای هماهنگی بعدی استفاده می‌شود.</p>
       <div class="row2">
-        <label class="field"><span class="flabel">نام و نام‌خانوادگی</span><input type="text" id="f_name" placeholder="مثلاً: علی رضایی"></label>
+        <label class="field"><span class="flabel"><span class="req">*</span>نام و نام‌خانوادگی</span><input type="text" id="f_name" placeholder="مثلاً: علی رضایی"><div class="field-err-msg" id="err_f_name">این فیلد الزامی است</div></label>
         <label class="field"><span class="flabel">نام کسب‌وکار / برند</span><input type="text" id="f_biz" placeholder="مثلاً: فروشگاه رزا"></label>
       </div>
       <div class="row2">
-        <label class="field"><span class="flabel">شماره تماس</span><input type="tel" id="f_phone" placeholder="09xxxxxxxxx"></label>
+        <label class="field"><span class="flabel"><span class="req">*</span>شماره تماس</span><input type="tel" id="f_phone" placeholder="09xxxxxxxxx"><div class="field-err-msg" id="err_f_phone">شماره تماس معتبر وارد کنید</div></label>
         <label class="field"><span class="flabel">ایمیل</span><input type="email" id="f_email" placeholder="you@example.com"></label>
       </div>
       <div class="nav-row">
         <button class="btn-ghost" onclick="go(0)">→ قبلی</button>
-        <button class="btn-primary" onclick="go(2)">بعدی ←</button>
+        <button class="btn-primary" onclick="nextStep(1)">بعدی ←</button>
       </div>
     </div>
 
     <div class="step" data-step="2">
       <div class="step-eyebrow mono">02 / ساختار</div>
       <h2>نوع سایت و صفحات</h2>
-      <p class="hint">نوع سایت را انتخاب کنید (می‌توانید بیشتر از یکی را بزنید).</p>
+      <p class="hint"><span class="req">*</span>نوع سایت را انتخاب کنید (می‌توانید بیشتر از یکی را بزنید).</p>
       <div class="chip-grid" id="siteType">
         <div class="chip" data-val="فروشگاهی"><div class="ctitle">فروشگاهی <span class="mark"></span></div><div class="cdesc">فروش آنلاین محصول با سبد خرید و پرداخت</div></div>
         <div class="chip" data-val="شرکتی / معرفی خدمات"><div class="ctitle">شرکتی / معرفی خدمات <span class="mark"></span></div><div class="cdesc">معرفی کسب‌وکار، خدمات و تیم</div></div>
@@ -345,23 +355,25 @@
         <div class="chip" data-val="رزرو / نوبت‌دهی"><div class="ctitle">رزرو / نوبت‌دهی <span class="mark"></span></div><div class="cdesc">رزرو آنلاین وقت یا خدمات</div></div>
         <div class="chip" data-val="سایر"><div class="ctitle">سایر <span class="mark"></span></div><div class="cdesc">توضیح در انتهای فرم</div></div>
       </div>
-      <label class="field" style="margin-top:18px;"><span class="flabel">صفحات موردنیاز (هرکدام را با کاما جدا کنید)</span><input type="text" id="f_pages" placeholder="مثلاً: صفحه اصلی، درباره ما، محصولات، تماس با ما"></label>
+      <div class="field-err-msg" id="err_siteType">لطفاً حداقل یک نوع سایت را انتخاب کنید</div>
+      <label class="field" style="margin-top:18px;"><span class="flabel"><span class="req">*</span>صفحات موردنیاز (هرکدام را با کاما جدا کنید)</span><input type="text" id="f_pages" placeholder="مثلاً: صفحه اصلی، درباره ما، محصولات، تماس با ما"><div class="field-err-msg" id="err_f_pages">این فیلد الزامی است</div></label>
       <div class="nav-row">
         <button class="btn-ghost" onclick="go(1)">→ قبلی</button>
-        <button class="btn-primary" onclick="go(3)">بعدی ←</button>
+        <button class="btn-primary" onclick="nextStep(2)">بعدی ←</button>
       </div>
     </div>
 
     <div class="step" data-step="3">
       <div class="step-eyebrow mono">03 / طراحی</div>
       <h2>سبک بصری</h2>
-      <p class="hint">حس‌وحال کلی سایت چطور باشد؟</p>
+      <p class="hint"><span class="req">*</span>حس‌وحال کلی سایت چطور باشد؟</p>
       <div class="chip-grid" id="siteStyle">
         <div class="chip" data-val="مینیمال و ساده"><div class="ctitle">مینیمال و ساده <span class="mark"></span></div><div class="cdesc">فضای خالی زیاد، تمیز و آرام</div></div>
         <div class="chip" data-val="لوکس و شیک"><div class="ctitle">لوکس و شیک <span class="mark"></span></div><div class="cdesc">رنگ‌های تیره، جزئیات ظریف</div></div>
         <div class="chip" data-val="پرانرژی و رنگی"><div class="ctitle">پرانرژی و رنگی <span class="mark"></span></div><div class="cdesc">رنگ‌های شاد، پویا و جوان</div></div>
         <div class="chip" data-val="کلاسیک و رسمی"><div class="ctitle">کلاسیک و رسمی <span class="mark"></span></div><div class="cdesc">قابل‌اعتماد و سازمانی</div></div>
       </div>
+      <div class="field-err-msg" id="err_siteStyle">لطفاً حداقل یک سبک بصری را انتخاب کنید</div>
       <label class="field" style="margin-top:16px;"><span class="flabel">رنگ‌های مورد علاقه</span></label>
       <div class="swatches" id="swatches">
         <div class="swatch" style="background:#4fd8c4" data-c="فیروزه‌ای"></div>
@@ -376,7 +388,7 @@
       <label class="field" style="margin-top:16px;"><span class="flabel">لینک چند سایت که استایلش را می‌پسندید (اختیاری)</span><input type="text" id="f_refs" placeholder="مثلاً: example.com , example2.com"></label>
       <div class="nav-row">
         <button class="btn-ghost" onclick="go(2)">→ قبلی</button>
-        <button class="btn-primary" onclick="go(4)">بعدی ←</button>
+        <button class="btn-primary" onclick="nextStep(3)">بعدی ←</button>
       </div>
     </div>
 
@@ -404,25 +416,27 @@
       <div class="step-eyebrow mono">05 / لجستیک</div>
       <h2>محتوا، دامنه و بودجه</h2>
       <div class="row2">
-        <label class="field"><span class="flabel">وضعیت محتوا (متن/عکس/لوگو)</span>
+        <label class="field"><span class="flabel"><span class="req">*</span>وضعیت محتوا (متن/عکس/لوگو)</span>
           <select id="f_content">
             <option value="">انتخاب کنید</option>
             <option>کاملاً آماده دارم</option>
             <option>بخشی آماده دارم</option>
             <option>هیچی ندارم، شما تهیه کنید</option>
           </select>
+          <div class="field-err-msg" id="err_f_content">لطفاً یک گزینه انتخاب کنید</div>
         </label>
-        <label class="field"><span class="flabel">دامنه و هاست</span>
+        <label class="field"><span class="flabel"><span class="req">*</span>دامنه و هاست</span>
           <select id="f_domain">
             <option value="">انتخاب کنید</option>
             <option>دامنه و هاست دارم</option>
             <option>فقط دامنه دارم</option>
             <option>هیچ‌کدام را ندارم</option>
           </select>
+          <div class="field-err-msg" id="err_f_domain">لطفاً یک گزینه انتخاب کنید</div>
         </label>
       </div>
       <div class="row2">
-        <label class="field"><span class="flabel">بودجه تقریبی</span>
+        <label class="field"><span class="flabel"><span class="req">*</span>بودجه تقریبی</span>
           <select id="f_budget">
             <option value="">انتخاب کنید</option>
             <option>زیر ۵ میلیون تومان</option>
@@ -431,8 +445,9 @@
             <option>بالای ۳۰ میلیون تومان</option>
             <option>هنوز مشخص نیست</option>
           </select>
+          <div class="field-err-msg" id="err_f_budget">لطفاً یک گزینه انتخاب کنید</div>
         </label>
-        <label class="field"><span class="flabel">زمان‌بندی موردنظر</span>
+        <label class="field"><span class="flabel"><span class="req">*</span>زمان‌بندی موردنظر</span>
           <select id="f_time">
             <option value="">انتخاب کنید</option>
             <option>فوری (کمتر از ۲ هفته)</option>
@@ -440,11 +455,12 @@
             <option>۱ تا ۲ ماه</option>
             <option>عجله‌ای ندارم</option>
           </select>
+          <div class="field-err-msg" id="err_f_time">لطفاً یک گزینه انتخاب کنید</div>
         </label>
       </div>
       <div class="nav-row">
         <button class="btn-ghost" onclick="go(4)">→ قبلی</button>
-        <button class="btn-primary" onclick="go(6)">بعدی ←</button>
+        <button class="btn-primary" onclick="nextStep(5)">بعدی ←</button>
       </div>
     </div>
 
@@ -475,7 +491,6 @@
         <div id="invoiceRows"></div>
       </div>
       <div class="sms-status mono" id="smsStatus"></div>
-      <button class="btn-ghost" style="border:1px solid var(--line); border-radius:8px; padding:8px 14px; margin-top:6px;" onclick="testSms()">🔧 تست ارسال پیامک (بدون پرکردن فرم)</button>
 
       <div class="copy-row">
         <a class="btn btn-bale" id="baleBtn" href="https://ble.ir/poshtibany12" target="_blank" rel="noopener" onclick="copyInvoice()">
@@ -539,6 +554,7 @@
       const chip = e.target.closest('.chip');
       if(!chip) return;
       chip.classList.toggle('checked');
+      grid.classList.remove('group-error');
     });
   });
 
@@ -554,6 +570,84 @@
   }
   function listOrDash(arr){ return arr.length ? arr.join('، ') : '—'; }
   function valOrDash(v){ return v && v.trim() ? v.trim() : '—'; }
+
+  // --- اعتبارسنجی فیلدهای اجباری هر مرحله ---
+  function clearFieldError(inputEl, errId){
+    inputEl.classList.remove('field-error');
+    const err = document.getElementById(errId);
+    if(err) err.classList.remove('show');
+  }
+  function setFieldError(inputEl, errId){
+    inputEl.classList.add('field-error');
+    const err = document.getElementById(errId);
+    if(err) err.classList.add('show');
+  }
+  function isValidPhone(v){
+    return /^0?9\d{9}$/.test(v.replace(/\s/g,''));
+  }
+
+  // پاک‌کردن خطا هنگام تایپ/تغییر
+  ['f_name','f_phone','f_pages','f_content','f_domain','f_budget','f_time'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('input', ()=>clearFieldError(el, 'err_'+id));
+    if(el) el.addEventListener('change', ()=>clearFieldError(el, 'err_'+id));
+  });
+
+  function validateStep(step){
+    let ok = true;
+
+    if(step === 1){
+      const name = document.getElementById('f_name');
+      const phone = document.getElementById('f_phone');
+      clearFieldError(name,'err_f_name'); clearFieldError(phone,'err_f_phone');
+      if(!name.value.trim()){ setFieldError(name,'err_f_name'); ok = false; }
+      if(!phone.value.trim() || !isValidPhone(phone.value)){ setFieldError(phone,'err_f_phone'); ok = false; }
+    }
+
+    if(step === 2){
+      const pages = document.getElementById('f_pages');
+      const typeGrid = document.getElementById('siteType');
+      clearFieldError(pages,'err_f_pages');
+      typeGrid.classList.remove('group-error');
+      document.getElementById('err_siteType').classList.remove('show');
+      if(getChecked('siteType').length === 0){
+        typeGrid.classList.add('group-error');
+        document.getElementById('err_siteType').classList.add('show');
+        ok = false;
+      }
+      if(!pages.value.trim()){ setFieldError(pages,'err_f_pages'); ok = false; }
+    }
+
+    if(step === 3){
+      const styleGrid = document.getElementById('siteStyle');
+      styleGrid.classList.remove('group-error');
+      document.getElementById('err_siteStyle').classList.remove('show');
+      if(getChecked('siteStyle').length === 0){
+        styleGrid.classList.add('group-error');
+        document.getElementById('err_siteStyle').classList.add('show');
+        ok = false;
+      }
+    }
+
+    if(step === 5){
+      ['f_content','f_domain','f_budget','f_time'].forEach(id=>{
+        const el = document.getElementById(id);
+        clearFieldError(el,'err_'+id);
+        if(!el.value){ setFieldError(el,'err_'+id); ok = false; }
+      });
+    }
+
+    return ok;
+  }
+
+  function nextStep(fromStep){
+    if(!validateStep(fromStep)){
+      const firstError = document.querySelector('.field-error, .group-error');
+      if(firstError) firstError.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    go(fromStep + 1);
+  }
 
   function buildInvoice(){
     const name = valOrDash(document.getElementById('f_name').value);
@@ -634,17 +728,6 @@
       console.error('SMS send failed:', err);
       setSmsStatus('err', 'ارسال ناموفق: ' + err.message);
     }
-  }
-
-  function testSms(){
-    sendOrderSms({
-      orderId: 'TEST-0001', name: 'تست', biz: 'کسب‌وکار تستی', phone: '09120000000',
-      email: 'test@example.com', types: 'فروشگاهی', pages: 'صفحه اصلی، تماس',
-      styles: 'مینیمال', colors: 'آبی', refs: '—', feats: 'فرم تماس',
-      content: 'آماده دارم', domain: 'دارم', budget: '۵ تا ۱۵ میلیون تومان',
-      time: '۲ تا ۴ هفته', notes: 'این یک پیامک تستی است.'
-    });
-    go(7);
   }
 
   function copyInvoice(){
